@@ -3,95 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/x.icon" href="favicon.ico">
-  <title>Sapp v1</title>
+  <title>Metheus v1.1</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #1e1f24;
-      color: #e5e7eb;
-      overflow: hidden;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background-color: #121212;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background: #111827;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      justify-content: space-between;
+      padding: 10px 16px;
+      background-color: #1f1f1f;
     }
 
-    .title-bar {
-      flex: 1;
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      width: 36px;
+      height: 36px;
       margin-right: 10px;
-      background: transparent;
+    }
+
+    .search-bar {
+      flex-grow: 1;
+      margin: 0 16px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
       border: none;
-      border-bottom: 1px solid #555;
-      color: #f3f4f6;
-      font-size: 18px;
-      outline: none;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+      color: #fff;
+      font-size: 14px;
     }
 
     .hamburger {
       font-size: 24px;
-      background: #374151;
-      padding: 6px 12px;
-      border-radius: 6px;
       cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
     }
 
-    .container {
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .popup.active {
+      display: block;
+    }
+
+    .grid-wrapper {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 12px;
-      padding: 12px;
-      height: calc(100vh - 100px);
+      gap: 10px;
+      width: 100%;
+      max-width: 1000px;
+      height: 100%;
+      padding: 10px;
     }
 
-    .tile {
-      background: #2d2f3a;
+    .tile, .add-btn {
+      background-color: #1e1e1e;
       border-radius: 10px;
+      text-align: center;
+      position: relative;
+      transition: 0.2s;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
-      position: relative;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: background 0.2s, transform 0.1s;
     }
 
-    .tile:hover {
-      background: #3b3d4a;
-      transform: translateY(-2px);
+    .tile:hover, .add-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
     }
 
     .tile img {
-      width: 64px;
-      height: 64px;
-      margin-bottom: 6px;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 10px;
     }
 
-    .tile span {
+    .tile-name {
       font-size: 14px;
-      text-align: center;
+      margin-top: 5px;
+      word-break: break-word;
     }
 
     .remove-btn {
       position: absolute;
-      top: 5px;
-      right: 5px;
-      background: #ef4444;
-      color: white;
-      border: none;
+      top: 6px;
+      right: 6px;
+      width: 12px;
+      height: 12px;
+      background-color: red;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
+      border: none;
+      cursor: pointer;
       display: none;
     }
 
@@ -99,274 +142,179 @@
       display: block;
     }
 
-    .add-tile {
-      font-size: 36px;
-      color: #9ca3af;
-      background: #1f2937;
-      border: 2px dashed #6b7280;
-      justify-content: center;
-      transition: all 0.3s ease;
+    .add-btn {
+      font-size: 32px;
+      color: #aaa;
+      border: 2px dashed #444;
+      cursor: pointer;
     }
 
-    .add-tile:hover {
-      background: #2563eb;
-      border-color: #60a5fa;
-      color: white;
-      font-weight: bold;
-      transform: scale(1.05);
-    }
-
-    footer {
+    .bottom-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #111827;
-      padding: 10px 20px;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
+      padding: 6px 20px;
+      background: #1f1f1f;
+      font-size: 14px;
+      height: 40px;
     }
 
-    footer button {
-      background: #2563eb;
+    button {
+      background-color: #2a2a2a;
+      color: #fff;
       border: none;
-      padding: 8px 16px;
-      color: white;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-
-    footer button:hover {
-      background: #1d4ed8;
-    }
-
-    #aboutModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-
-    #aboutModalContent {
-      background: #1f2937;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
-      color: #d1d5db;
-    }
-
-    #addPopup {
-      position: absolute;
-      display: none;
-      flex-direction: column;
-      background: #1f2937;
-      padding: 12px;
-      border-radius: 10px;
-      z-index: 1000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    #addPopup input {
-      margin-bottom: 8px;
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      background: #374151;
-      color: white;
-      width: 200px;
-    }
-
-    #addPopup button {
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 6px;
-      font-weight: bold;
       cursor: pointer;
     }
 
-    #addPopup button:hover {
-      background: #059669;
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(8, 1fr);
+      }
     }
-
   </style>
 </head>
 <body>
+
   <header>
-    <input id="pageTitle" class="title-bar" />
-    <div class="hamburger" onclick="openAboutModal()">☰</div>
+    <div class="logo">
+      <img src="favicon.ico" alt="Metheus Logo"/>
+      <span style="font-weight: 600;">Metheus</span>
+    </div>
+    <div class="search-bar">
+      <form id="searchForm" target="_blank">
+        <input type="text" id="searchInput" placeholder="Search with Google..." />
+      </form>
+    </div>
+    <button class="hamburger" onclick="togglePopup()">☰</button>
   </header>
 
-  <div id="aboutModal" onclick="closeAboutModal(event)">
-    <div id="aboutModalContent">
-      <h2>About Us</h2>
-      <p><strong>App Name:</strong> sapp v1<br>
-         <strong>Builder:</strong> Haresh.G<br>
-         <strong>Company:</strong> IO Group of Companies</p>
-      <h3>App Description</h3>
-      <p>It is an application to access websites where users can add their own websites.</p>
-      <p><strong>Credits:</strong> ChatGPT</p>
-      <button onclick="closeAboutModal(event)">Close</button>
-    </div>
+  <div class="popup" id="aboutPopup">
+    <strong>About Metheus</strong>
+    <p>Author: Haresh G<br>
+    Version: 1.1<br>
+    A modern web-based launcher.<br>
+    Powered by GPT + Google.<br><br>
+    Click outside to close.</p>
   </div>
 
-  <div id="addPopup">
-    <input id="popupName" placeholder="Website Name" />
-    <input id="popupURL" placeholder="https://example.com" />
-    <button onclick="submitTile()">Add</button>
+  <div class="grid-wrapper">
+    <div class="grid" id="grid"></div>
   </div>
 
-  <div class="container" id="gridContainer"></div>
-
-  <footer>
-    <span id="pageIndicator">1 out of 5</span>
-    <div>
-      <button onclick="prevPage()">⬅ Prev</button>
-      <button onclick="nextPage()">Next ➡</button>
-    </div>
-  </footer>
+  <div class="bottom-bar">
+    <button onclick="prevPage()">← Back</button>
+    <span id="pageInfo">(1 of 5 pages)</span>
+    <button onclick="nextPage()">Next →</button>
+  </div>
 
   <script>
-    const grid = document.getElementById('gridContainer');
-    const titleInput = document.getElementById('pageTitle');
-    const pageIndicator = document.getElementById('pageIndicator');
-    const maxPages = 5;
-    const tilesPerPage = 16;
-    let currentPage = 1;
+    let currentPage = 0;
+    let pages = JSON.parse(localStorage.getItem("metheusPages")) || Array(5).fill().map(() => []);
 
-    let data = JSON.parse(localStorage.getItem("sapp_data")) || {
-      pages: Array(maxPages).fill().map(() => ({ title: "Untitled Page", tiles: [] }))
-    };
-
-    let popupIndex = null;
-
-    function saveData() {
-      localStorage.setItem("sapp_data", JSON.stringify(data));
+    function savePages() {
+      localStorage.setItem("metheusPages", JSON.stringify(pages));
     }
 
-    function render() {
-      const page = data.pages[currentPage - 1];
-      titleInput.value = page.title;
+    function togglePopup() {
+      const popup = document.getElementById("aboutPopup");
+      popup.classList.toggle("active");
+    }
+
+    window.onclick = function(e) {
+      const popup = document.getElementById("aboutPopup");
+      if (popup.classList.contains('active') && !popup.contains(e.target) && e.target.className !== "hamburger") {
+        popup.classList.remove("active");
+      }
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid');
       grid.innerHTML = '';
+      const currentTiles = pages[currentPage];
 
-      page.tiles.forEach((tile, i) => {
-        const el = document.createElement('div');
-        el.className = 'tile';
-        el.onclick = () => window.open(tile.url, '_blank');
+      for (let i = 0; i < 16; i++) {
+        const tileData = currentTiles[i];
+        const tileDiv = document.createElement('div');
+        tileDiv.className = tileData ? 'tile' : 'add-btn';
 
-        const img = document.createElement('img');
-        img.src = `https://www.google.com/s2/favicons?sz=64&domain_url=${tile.url}`;
-        const name = document.createElement('span');
-        name.textContent = tile.name;
+        if (tileData) {
+          const icon = document.createElement('img');
+          try {
+            const domain = new URL(tileData.url).hostname;
+            icon.src = `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+          } catch {
+            icon.src = "favicon.ico";
+          }
 
-        const rm = document.createElement('button');
-        rm.className = 'remove-btn';
-        rm.textContent = '×';
-        rm.onclick = e => {
-          e.stopPropagation();
-          page.tiles.splice(i, 1);
-          saveData();
-          render();
-        };
+          const name = document.createElement('div');
+          name.className = 'tile-name';
+          name.innerText = tileData.name;
 
-        el.appendChild(rm);
-        el.appendChild(img);
-        el.appendChild(name);
-        grid.appendChild(el);
-      });
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-btn';
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            currentTiles.splice(i, 1);
+            savePages();
+            renderGrid();
+          };
 
-      const remaining = tilesPerPage - page.tiles.length;
-      for (let i = 0; i < remaining; i++) {
-        const add = document.createElement('div');
-        add.className = 'tile add-tile';
-        add.textContent = '+';
-        add.onclick = (e) => {
-          popupIndex = i;
-          showAddPopup(e);
-        };
-        grid.appendChild(add);
+          tileDiv.onclick = () => {
+            window.open(tileData.url, '_blank');
+          };
+
+          tileDiv.appendChild(icon);
+          tileDiv.appendChild(name);
+          tileDiv.appendChild(removeBtn);
+        } else {
+          tileDiv.innerText = '+';
+          tileDiv.onclick = () => {
+            const name = prompt("Enter website name:");
+            const url = prompt("Enter website URL (with https://):");
+            if (name && url) {
+              currentTiles[i] = { name, url };
+              savePages();
+              renderGrid();
+            }
+          };
+        }
+
+        grid.appendChild(tileDiv);
       }
 
-      pageIndicator.textContent = `${currentPage} out of ${maxPages}`;
-    }
-
-    function submitTile() {
-      const name = document.getElementById("popupName").value.trim();
-      const url = document.getElementById("popupURL").value.trim();
-      if (!name || !url) return alert("Please enter both fields");
-
-      const page = data.pages[currentPage - 1];
-      if (page.tiles.length >= tilesPerPage) return alert("Page full!");
-
-      page.tiles.push({ name, url });
-      saveData();
-      hideAddPopup();
-      render();
-    }
-
-    function showAddPopup(e) {
-      const popup = document.getElementById("addPopup");
-      popup.style.display = "flex";
-      const rect = e.target.getBoundingClientRect();
-      popup.style.left = rect.left + "px";
-      popup.style.top = rect.top + "px";
-      document.getElementById("popupName").value = '';
-      document.getElementById("popupURL").value = '';
-    }
-
-    function hideAddPopup() {
-      document.getElementById("addPopup").style.display = "none";
-    }
-
-    titleInput.onchange = () => {
-      data.pages[currentPage - 1].title = titleInput.value;
-      saveData();
-    };
-
-    function nextPage() {
-      if (currentPage < maxPages) {
-        currentPage++;
-        hideAddPopup();
-        render();
-      }
+      document.getElementById("pageInfo").innerText = `(${currentPage + 1} of 5 pages)`;
     }
 
     function prevPage() {
-      if (currentPage > 1) {
+      if (currentPage > 0) {
         currentPage--;
-        hideAddPopup();
-        render();
+        renderGrid();
       }
     }
 
-    function openAboutModal() {
-      document.getElementById("aboutModal").style.display = "flex";
-    }
-
-    function closeAboutModal(e) {
-      if (e.target.id === "aboutModal" || e.target.tagName === "BUTTON") {
-        document.getElementById("aboutModal").style.display = "none";
+    function nextPage() {
+      if (currentPage < 4) {
+        currentPage++;
+        renderGrid();
       }
     }
 
-    window.addEventListener("click", function(e) {
-      if (!document.getElementById("addPopup").contains(e.target) &&
-          !e.target.classList.contains("add-tile")) {
-        hideAddPopup();
+    document.getElementById("searchForm").onsubmit = function (e) {
+      e.preventDefault();
+      const query = document.getElementById("searchInput").value;
+      if (query) {
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
       }
-    });
+    };
 
-    render();
+    renderGrid();
   </script>
+
 </body>
 </html>
-
-
 
 
 
